@@ -1,0 +1,33 @@
+# Use neovim for vim if present.
+[ -x "$(command -v nvim)" ] && alias vim="nvim" vimdiff="nvim -d"
+
+# Verbosity and settings that you pretty much just always are going to want.
+alias \
+	cp="cp -iv" \
+	mv="mv -iv" \
+	rm="rm -vI" \
+	mkd="mkdir -pv" \
+	yt="youtube-dl --add-metadata -i" \
+	yta="yt -x -f bestaudio/best" \
+	ffmpeg="ffmpeg -hide_banner"
+
+# Colorize commands when possible.
+alias \
+	ls="ls -hN --color=auto --group-directories-first" \
+	grep="grep --color=auto" \
+	diff="diff --color=auto"
+
+# Use better coreutils, bat instead of cat, fd instead of find and so on
+
+# These common commands are just too long! Abbreviate them.
+alias \
+	ka="killall" \
+	g="git" \
+	e="$EDITOR" \
+	v="$EDITOR" \
+	aud="sudo apt update" \
+	aup="sudo apt upgrade" \
+	ai="sudo apt install" \
+	ar="sudo apt remove" \
+	aar="sudo apt autoremove" \
+	as="apt-cache search"
