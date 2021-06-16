@@ -1,16 +1,56 @@
 # Set up the prompt
 
-autoload -Uz promptinit
-promptinit
-prompt fade red
+autoload -Uz promptinit && promptinit
+zmodload zsh/nearcolor
+
+function gpu_temp() {
+	nvidia-smi | grep "[[:digit:]]\+C" | cut -d' ' -f6
+}
+function cpu_temp() {
+	sensors | grep Package | cut -d' ' -f5 | cut -d'+' -f2 | cut -d'.' -f1
+}
+function vpn_ip() {
+	VPN_IP=$(ip addr | grep tun0 | grep inet | tr -s " " | cut -d " " -f 3 | cut -d "/" -f 1)
+	ETH_IP=$(ip addr | grep enp | grep inet | tr -s " " | cut -d " " -f 3 | cut -d "/" -f 1)
+	if [ ! -z "$VPN_IP" ]; then
+		echo "%F{cyan}$VPN_IP%f"
+	elif [ ! -z "$ETH_IP" ]; then
+		echo "%F{cyan}$ETH_IP%f"
+	else
+		echo "%F{magenta}Disconnected%f"
+	fi
+
+}
+function gp(){
+	echo "%B%F{green}|%f%b"
+}
+function preexec() {
+	timer=$(date +%s)
+}
+function date_format() {
+	date +"%H:%M - %a %d/%m"
+}
+
+
+function precmd() {
+	export PS1="%F{red}$USER %F{blue}in %F{red}%B$(dirs) %b$(gp) %F{green}$(gpu_temp) $(gp) %F{red}$(cpu_temp)C $(gp) $(vpn_ip) $(gp) %B$(date_format)%b"
+	if [ $timer ]; then
+		now=$(date +%s)
+		elapsed=$(($now-$timer))
+		export PS1="$PS1 $(gp) %F{#ffff00}%B${elapsed}%bs%f"
+		unset timer
+	fi
+	export PS1="$PS1$prompt_newline%(?.%F{green}>_.%F{red}(%?%) >_) %f"
+}
 
 export EDITOR="nvim"
 export TERMINAL="st"
-export BROWSER="qutebrowser"
+export BROWSER="firefox"
 
 setopt histignorealldups sharehistory
 
 bindkey -v
+bindkey '^R' history-incremental-search-backward
 
 [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/shell/aliasrc" ] && source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/aliasrc"
 
